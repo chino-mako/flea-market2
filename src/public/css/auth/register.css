@@ -1,0 +1,76 @@
+/* 会員登録フォーム全体 */
+.form-container {
+    max-width: 500px;
+    margin: 60px auto;
+    padding: 0 20px;
+}
+
+/* タイトル */
+.form-title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 30px;
+}
+
+/* フォームボックス全体 */
+.form-box {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ラベル */
+.form-box label {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+/* 入力欄 */
+.form-input {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* エラーメッセージボックス */
+.error-message-box {
+    background-color: #ffe6e6;
+    padding: 10px 15px;
+    border-left: 4px solid #ff5c5c;
+    margin-bottom: 20px;
+}
+
+/* 登録ボタン */
+.form-box button {
+    margin-top: 20px;
+    background-color: #ff5c5c;
+    color: white;
+    font-weight: bold;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.form-box button:hover {
+    background-color: #e84e4e;
+}
+
+/* ログインリンク */
+.login-link {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.login-link a {
+    color: #007bff;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+.login-link a:hover {
+    text-decoration: underline;
+}

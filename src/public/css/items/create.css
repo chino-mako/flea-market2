@@ -1,0 +1,145 @@
+/* 全体 */
+.listing-container {
+    max-width: 700px;
+    margin: 40px auto;
+    padding: 0 20px;
+    font-family: 'Helvetica Neue', sans-serif;
+}
+
+/* タイトル */
+.page-title {
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 40px;
+}
+
+/* セクション */
+.form-section {
+    margin-bottom: 40px;
+}
+
+.section-title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    display: block;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 8px;
+}
+
+/* アップロードボックス */
+.image-upload-box {
+    border: 1px dashed #ccc;
+    padding: 40px 20px;
+    text-align: center;
+    border-radius: 4px;
+}
+
+.upload-button {
+    background-color: #ff6666;
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: inline-block;
+}
+
+/* カテゴリー */
+.category-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.category-chip {
+    display: inline-block;
+    padding: 6px 12px;
+    border: 1px solid #ff9999;
+    border-radius: 9999px;
+    background-color: #fff;
+    color: #ff6666;
+    cursor: pointer;
+    font-size: 13px;
+    user-select: none;
+    transition: 0.2s;
+}
+
+.category-chip input:checked + label,
+.category-chip:has(input:checked) {
+    background-color: #ff6666;
+    color: white;
+    border-color: #ff6666;
+}
+
+/* セレクト・入力フィールド共通 */
+.form-group {
+    margin-top: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+input[type="text"],
+textarea,
+select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+textarea {
+    resize: vertical;
+}
+
+/* 販売価格 */
+.price-input {
+    display: flex;
+    align-items: center;
+}
+
+.price-input span {
+    padding: 10px;
+    background: #eee;
+    border: 1px solid #ccc;
+    border-right: none;
+    border-radius: 4px 0 0 4px;
+}
+
+.price-input input {
+    flex: 1;
+    border-radius: 0 4px 4px 0;
+    border-left: none;
+}
+
+/* エラーメッセージ */
+.error-message {
+    color: red;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+/* 送信ボタン */
+.submit-btn {
+    width: 100%;
+    background-color: #ff6666;
+    color: #fff;
+    font-size: 16px;
+    padding: 14px 0;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 30px;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.submit-btn:hover {
+    background-color: #ff4c4c;
+}

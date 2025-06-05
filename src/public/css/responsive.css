@@ -1,0 +1,65 @@
+/* --- PC 1400px～1540px --- */
+@media (min-width: 1400px) and (max-width: 1540px) {
+    .form-container {
+        max-width: 600px;
+    }
+
+    .form-title {
+        font-size: 26px;
+    }
+
+    .form-input {
+        font-size: 16px;
+    }
+}
+
+/* --- タブレット 768px～850px --- */
+@media (min-width: 768px) and (max-width: 850px) {
+    .form-container {
+        padding: 0 10px;
+        max-width: 90%;
+    }
+
+    .form-title {
+        font-size: 20px;
+        margin-bottom: 20px;
+    }
+
+    .form-input {
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    .form-button {
+        font-size: 14px;
+        padding: 10px;
+    }
+}
+
+/* --- スマートフォン（600px以下）--- */
+@media (max-width: 600px) {
+    .form-container {
+        margin: 40px auto;
+        padding: 0 15px;
+    }
+
+    .form-title {
+        font-size: 18px;
+    }
+
+    .form-input {
+        font-size: 13px;
+        padding: 8px;
+    }
+
+    .form-button {
+        width: 100%;
+        padding: 12px;
+        font-size: 15px;
+    }
+
+    .login-link,
+    .form-link {
+        font-size: 13px;
+    }
+}
