@@ -10,11 +10,11 @@ class CreateAddressesTable extends Migration
     {
         Schema::create('addresses', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade'); // ユーザーと紐づく
-            $table->unsignedBigInteger('item_id')->nullable(); // 商品ごとの配送先にも対応
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('item_id')->nullable();
             $table->string('postal_code');
             $table->string('address');
-            $table->string('building')->nullable(); // 建物名・部屋番号など
+            $table->string('building')->nullable();
             $table->timestamps();
         });
     }

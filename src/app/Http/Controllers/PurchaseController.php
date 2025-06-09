@@ -23,7 +23,7 @@ class PurchaseController extends Controller
         $item = Item::findOrFail($item_id);
         $image = $item->image_path;
         $isExternal = Str::startsWith($image, ['http://', 'https://']);
-        $user = auth()->user();
+        $user = auth()->user()->load('addressRelation');
 
         return view('purchase.show', [
             'item' => $item,
@@ -38,11 +38,8 @@ class PurchaseController extends Controller
         $validated = $request->validated();
         $item = Item::findOrFail($item_id);
         $user = auth()->user();
-
-        // Stripe初期化
         Stripe::setApiKey(config('services.stripe.secret'));
 
-        // Checkoutセッション作成
         $session = Session::create([
             'payment_method_types' => ['card'],
             'line_items' => [[

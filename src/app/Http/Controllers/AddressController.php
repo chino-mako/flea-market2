@@ -16,23 +16,24 @@ class AddressController extends Controller
 
     public function edit($item_id)
     {
-        $user = auth()->user()->load('address');
+        $user = auth()->user()->load('addressRelation');
 
         if (!$user) {
             return redirect()->route('auth.login')->withErrors('ログインしてください');
         }
 
-        if (!$user->address) {
-            $user->address()->create([
+        if (!$user->addressRelation) {
+            $user->addressRelation()->create([
                 'postal_code' => $user->postal_code,
                 'address' => $user->address,
                 'building' => $user->building,
             ]);
+            $user->refresh();
         }
 
         return view('purchase.address_edit', [
             'item_id' => $item_id,
-            'address' => $user->address,
+            'address' => $user->addressRelation,
         ]);
     }
 
@@ -40,7 +41,7 @@ class AddressController extends Controller
     {
         $validated = $request->validated();
 
-        $address = auth()->user()->address ?? new Address();
+        $address = auth()->user()->addressRelation->first() ?? new Address();
         $address->fill($request->only(['postal_code', 'address', 'building']));
         $address->user_id = auth()->id();
         $address->save();

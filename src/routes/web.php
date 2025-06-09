@@ -21,7 +21,7 @@ use App\Http\Controllers\UserController;
 |
 */
 
-// 商品一覧画面（トップ）・マイリスト付き
+// 商品一覧画面（トップ）
 Route::get('/', [ItemController::class, 'index'])->name('items.index');
 Route::get('/mylist', function () {
     return redirect()->route('items.index', ['tab' => 'mylist']);
