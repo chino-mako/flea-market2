@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
-use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
@@ -30,9 +29,7 @@ class AuthController extends Controller
         Auth::login($user);
 
         if (!$user->hasVerifiedEmail()) {
-
             $user->sendEmailVerificationNotification();
-
             return redirect()->route('verification.notice');
         }
 
@@ -52,9 +49,7 @@ class AuthController extends Controller
     {
         $validated = $request->validated();
 
-        $credentials = $request->only('email', 'password');
-
-        if (Auth::attempt($credentials)) {
+        if (Auth::attempt($request->only('email', 'password'))) {
             return redirect()->route('items.index');
         }
 

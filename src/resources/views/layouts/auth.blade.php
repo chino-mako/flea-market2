@@ -20,6 +20,19 @@
     </header>
 
     <main class="main-container">
+        @if (session('success'))
+            <div class="custom-alert success">
+                <span class="alert-icon">✔</span>
+                <span class="alert-message">{{ session('success') }}</span>
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="alert alert-danger">
+                <span class="alert-icon">✔</span>
+                <span class="alert-message">{{ session('error') }}</span>
+            </div>
+        @endif
         @yield('content')
     </main>
 

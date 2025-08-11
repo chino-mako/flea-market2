@@ -23,6 +23,7 @@ class CreateItemsTable extends Migration
             $table->text('description');
             $table->decimal('price', 10, 2);
             $table->boolean('is_sold')->default(false);
+            $table->boolean('is_completed')->default(false);
             $table->timestamps();
         });
     }

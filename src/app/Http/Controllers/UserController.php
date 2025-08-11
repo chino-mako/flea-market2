@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use App\Http\Requests\ProfileRequest;
-use App\Models\Item;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Item;
+use App\Models\Rating;
 
 class UserController extends Controller
 {
@@ -19,65 +20,109 @@ class UserController extends Controller
     {
         $user = Auth::user();
         $tab = $request->query('tab', 'sell');
+        $unreadTotal = 0;
+        $ratings = $user->receivedRatings();
+        $ratingCount = $ratings->count();
+
+        $ratingAvg = $ratingCount > 0 ? round($ratings->avg('score')) : null;
+
+        $tradeItems = Item::where('is_completed', false)
+            ->where(function ($query) use ($user) {
+                $query
+                    ->whereHas('purchases', function ($q) use ($user) {
+                        $q->where('user_id', $user->id);
+                    })
+                    ->orWhere(function ($q) use ($user) {
+                        $q->where('user_id', $user->id)
+                        ->whereHas('messages');
+                    })
+                    ->orWhereHas('messages', function ($q) use ($user) {
+                        $q->where('user_id', $user->id);
+                    });
+            })
+            ->get();
+
+        $tradeItemCount = $tradeItems->count();
 
         if ($tab === 'buy') {
-            $items = $user->purchasedItems;
-        } else {
-            $items = $user->items;
+            $items = Item::where('is_completed', true)
+            ->whereHas('purchases', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            })
+            ->get();
+        } elseif ($tab === 'trade') {
+            $items = $tradeItems->load(['messages' => function ($q) {
+                $q->latest();
+            }])->sortByDesc(function ($item) {
+                return optional($item->messages->first())->created_at;
+            });
 
-            foreach ($items as $item) {
-                logger("item id: {$item->id}, user_id: {$item->user_id}, login user id: {$user->id}");
-            }
+            $unreadTotal = $items->sum(function ($item) use ($user) {
+                return $item->messages
+                    ->where('user_id', '!=', $user->id)
+                    ->where('is_read', false)
+                    ->count();
+            });
+        }
+        else {
+            $items = $user->items;
         }
 
-        return view('user.show', compact('user', 'items', 'tab'));
+        return view('user.show', compact('user', 'items', 'tab', 'tradeItemCount', 'unreadTotal', 'ratingAvg', 'ratingCount'));
     }
+
 
     public function edit()
     {
-        $user = auth()->user();
-        return view('user.edit', compact('user'));
+        $user = Auth::user();
+
+        $files = Storage::files('public/profile_images');
+        $images = array_map(fn($path) => str_replace('public/', '', $path), $files);
+
+        return view('user.edit', compact('user', 'images'));
     }
 
     public function update(ProfileRequest $request)
     {
         $validated = $request->validated();
-        $user = auth()->user();
+        $user = Auth::user();
 
         if ($request->hasFile('profile_image')) {
             $file = $request->file('profile_image');
             $path = $file->store('profile_images', 'public');
 
             if ($user->profile_image) {
-                \Storage::disk('public')->delete($user->profile_image);
+                Storage::disk('public')->delete($user->profile_image);
             }
 
             $user->profile_image = $path;
         }
 
-        $user->name = $validated['name'];
-        $user->postal_code = $validated['postal_code'];
-        $user->address = $validated['address'];
-        $user->building = $validated['building'] ?? null;
-        $user->profile_completed = true;
-        $user->save();
+        $user->fill([
+            'name'         => $validated['name'],
+            'postal_code'  => $validated['postal_code'],
+            'address'      => $validated['address'],
+            'building'     => $validated['building'] ?? null,
+        ])->save();
 
         return redirect()->route('items.index');
     }
 
     public function purchasedItems()
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $items = $user->purchasedItems ?? collect();
         $tab = 'buy';
+
         return view('user.show', compact('user', 'items', 'tab'));
     }
 
     public function listedItems()
     {
-        $user = auth()->user();
+        $user = Auth::user();
         $items = $user->items ?? collect();
         $tab = 'sell';
+
         return view('user.show', compact('user', 'items', 'tab'));
     }
 }

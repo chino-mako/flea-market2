@@ -11,8 +11,11 @@
 @section('content')
 
 <nav class="tab-menu">
-    <a href="{{ route('items.index', ['tab' => 'recommend']) }}" class="{{ $tab === 'recommend' ? 'active' : '' }}">おすすめ</a>
-    <a href="{{ route('items.index', ['tab' => 'mylist']) }}" class="{{ $tab === 'mylist' ? 'active' : '' }}">マイリスト</a>
+    <a href="{{ route('items.index', array_merge(request()->query(), ['tab' => 'recommend'])) }}"
+    class="{{ $tab === 'recommend' ? 'active' : '' }}">おすすめ</a>
+
+    <a href="{{ route('items.index', array_merge(request()->query(), ['tab' => 'mylist'])) }}"
+    class="{{ $tab === 'mylist' ? 'active' : '' }}">マイリスト</a>
 </nav>
 
 <div class="product-list">
@@ -29,7 +32,7 @@
                 <div class="item-name">{{ $item->title }}</div>
             </a>
             @if($item->is_sold)
-            <span class="sold-label">SOLD</span>
+                <span class="sold-label">SOLD</span>
             @endif
         </div>
     @endforeach

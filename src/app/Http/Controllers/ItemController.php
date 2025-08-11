@@ -3,45 +3,71 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use App\Models\Item;
 use App\Models\Category;
 use App\Models\Comment;
-use App\Models\Like;
+use App\Models\Message;
 use App\Http\Requests\ItemRequest;
 use App\Http\Requests\CommentRequest;
-
 
 class ItemController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Item::where('is_sold', false);
-
-        if ($request->filled('keyword')) {
-            $query->where('title', 'like', '%' . $request->keyword . '%');
-        }
-
         $tab = $request->query('tab', 'recommend');
+        $keyword = $request->input('keyword');
 
         if ($tab === 'mylist') {
             $user = auth()->user();
-            if (!$user) {
-                return redirect()->route('auth.login')->with('message', 'マイリストを見るにはログインしてください');
+
+            if ($user) {
+                $likesQuery = $user->likes();
+
+                if (!empty($keyword)) {
+                    $likesQuery->where('title', 'like', '%' . $keyword . '%');
+                }
+
+                $items = $likesQuery->paginate(12)->withQueryString();
+            } else {
+                $items = new LengthAwarePaginator(
+                    collect(),
+                    0,
+                    12,
+                    1,
+                    ['path' => request()->url(), 'query' => request()->query()]
+                );
             }
-            $items = $user->likes()->paginate(12)->withQueryString();
         } else {
+            $query = Item::query();
+
+            // 自分が出品した商品を除外
+            if (auth()->check()) {
+                $query->where('user_id', '!=', auth()->id());
+            }
+
+            if (!empty($keyword)) {
+                $query->where('title', 'like', '%' . $keyword . '%');
+            }
+
             $items = $query->paginate(12)->withQueryString();
         }
 
-        return view('items.index', compact('items', 'tab'));
+        return view('items.index', compact('items', 'tab', 'keyword'));
     }
 
     public function show($item_id)
     {
         $item = Item::withCount('likes')->findOrFail($item_id);
-        return view('items.show', compact('item'));
+
+        $error = null;
+        if ($item->is_sold) {
+            $error = 'この商品はすでに購入済みです。';
+        }
+
+        return view('items.show', compact('item', 'error'));
     }
 
     public function toggleLike(Item $item)
@@ -49,10 +75,8 @@ class ItemController extends Controller
         $user = auth()->user();
 
         if ($user->likes->contains($item->id)) {
-            // いいね解除
             $user->likes()->detach($item->id);
         } else {
-            // いいね登録
             $user->likes()->attach($item->id);
         }
 
@@ -62,25 +86,22 @@ class ItemController extends Controller
     public function create()
     {
         $categories = Category::all();
-
         return view('items.create', compact('categories'));
     }
 
     public function store(ItemRequest $request)
     {
-        if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('items', 'public');
-        } else {
-            $path = null;
-        }
+        $path = $request->hasFile('image')
+            ? $request->file('image')->store('items', 'public')
+            : null;
 
         $item = Item::create([
-            'user_id' => Auth::id(),
-            'title' => $request->input('title'),
+            'user_id'    => Auth::id(),
+            'title'      => $request->input('title'),
             'brand_name' => $request->input('brand_name'),
-            'description' => $request->input('description'),
-            'price' => $request->input('price'),
-            'condition' => $request->input('condition'),
+            'description'=> $request->input('description'),
+            'price'      => $request->input('price'),
+            'condition'  => $request->input('condition'),
             'image_path' => $path,
         ]);
 
@@ -91,13 +112,29 @@ class ItemController extends Controller
 
     public function storeComment(CommentRequest $request, $item_id)
     {
-        $item = Item::findOrFail($item_id);
+        $user = auth()->user();
 
-        $comment = new Comment();
-        $comment->item_id = $item->id;
-        $comment->user_id = auth()->id();
-        $comment->body = $request->input('body');
-        $comment->save();
+        // コメント保存
+        Comment::create([
+            'item_id' => $item_id,
+            'user_id' => $user->id,
+            'body'    => $request->input('body'),
+        ]);
+
+        // 商品購入済みか確認
+        $item = \App\Models\Item::findOrFail($item_id);
+        if ($item->is_sold) {
+            // 購入済み商品のコメントはチャットに反映しない
+            return redirect()->route('items.show', $item_id)->with('success', 'コメントを投稿しました。');
+        }
+
+        // チャットの最初のメッセージとしても登録
+        Message::create([
+            'item_id'    => $item_id,
+            'user_id'    => $user->id,
+            'content'    => $request->input('body'),
+            'image_path' => null,
+        ]);
 
         return redirect()->route('items.show', $item_id)->with('success', 'コメントを投稿しました。');
     }

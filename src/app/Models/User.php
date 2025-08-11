@@ -14,8 +14,13 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $fillable = [
         'name',
         'email',
+        'email_verified_at',
         'password',
-        'password_confirmation'
+        'password_confirmation',
+        'profile_image',
+        'postal_code',
+        'address',
+        'building',
     ];
 
     public function items()
@@ -43,8 +48,12 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Purchase::class);
     }
 
-    public function addressRelation()
+    public function messages() {
+        return $this->hasMany(Message::class);
+    }
+
+    public function receivedRatings()
     {
-        return $this->hasMany(Address::class);
+        return $this->hasMany(Rating::class, 'to_user_id');
     }
 }

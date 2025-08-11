@@ -31,7 +31,7 @@
 
         <label for="password_confirmation">確認用パスワード</label>
         <input type="password" id="password_confirmation" name="password_confirmation" class="form-input">
-        @error('password')
+        @error('password_confirmation')
             <div class="error-message">{{ $message }}</div>
         @enderror
 

@@ -14,11 +14,7 @@
 
     <div class="image-upload">
       <div class="image-preview">
-        @if($user->profile_image)
-          <img src="{{ asset('storage/' . $user->profile_image) }}" alt="プロフィール画像" class="preview-img">
-        @else
-          <div class="preview-placeholder"></div>
-        @endif
+        <img src="{{ $user->profile_image ? asset('storage/' . $user->profile_image) : '' }}" alt="プロフィール画像" class="preview-img">
       </div>
 
       <label for="profile_image" class="image-select-button">画像を選択する</label>
@@ -64,3 +60,22 @@
   </form>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+  document.getElementById('profile_image').addEventListener('change', function (event) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const preview = document.querySelector('.preview-img');
+        if (preview) {
+          preview.src = e.target.result;
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+</script>
+@endpush
+

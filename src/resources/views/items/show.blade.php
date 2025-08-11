@@ -14,6 +14,7 @@
 
     <div class="image-section">
         <img src="{{ $isExternal ? $image : asset('storage/' . $image) }}" alt="商品画像" class="item-image">
+
     </div>
 
     <div class="info-section">
@@ -23,31 +24,36 @@
 
         <div class="item-actions">
             <div class="icon-group">
-                {{-- コメント数 --}}
-                <div class="icon">
-                    💬 <span class="count">{{ $item->comments->count() }}</span>
-                </div>
-
-                {{-- いいねボタン（ログインユーザーのみトグル可能） --}}
-                <div class="icon">
+                {{-- いいね数 --}}
+                <div class="icon-item">
                     @auth
                         <form action="{{ route('items.toggleLike', $item->id) }}" method="POST" class="like-toggle-form">
                             @csrf
-                            <button type="submit" class="btn btn-link p-0 m-0 align-middle {{ auth()->user()->likes->contains($item->id) ? 'text-danger' : 'text-primary' }}">
-                                ⭐ <span class="count">{{ $item->likes_count ?? 0 }}</span>
+                            <button type="submit" class="btn btn-link p-0 m-0 align-middle {{ auth()->user()->likes->contains($item->id) ? 'liked' : 'not-liked' }}">
+                                ⭐︎
                             </button>
                         </form>
                     @else
-                        {{-- 未ログイン時は表示のみ --}}
-                        ⭐ <span class="count">{{ $item->likes_count ?? 0 }}</span>
+                        <a href="{{ route('auth.login') }}">⭐︎</a>
                     @endauth
+                        <span class="icon-count">{{ $item->likes_count ?? 0 }}</span>
+                </div>
+
+                {{-- コメント数 --}}
+                <div class="icon-item">
+                    💬<span class="icon-count">{{ $item->comments->count() }}</span>
                 </div>
             </div>
         </div>
 
-
-        {{-- 購入ボタン --}}
-        <a href="{{ route('purchase.show', $item->id) }}" class="buy-button">購入手続きへ</a>
+        {{-- 購入ボタンとエラーメッセージの表示制御 --}}
+        @if (!empty($error))
+            <div class="alert alert-danger">
+                {{ $error }}
+            </div>
+        @else
+            <a href="{{ route('purchase.show', $item->id) }}" class="buy-button">購入手続きへ</a>
+        @endif
 
         {{-- 商品説明 --}}
         <section class="description">
@@ -73,7 +79,9 @@
 
             @foreach($item->comments as $comment)
                 <div class="comment">
-                    <div class="user-icon"></div>
+                    <div class="user-icon">
+                        <img src="{{ asset('storage/' . $comment->user->profile_image) }}" alt="プロフィール画像" class="profile-img">
+                    </div>
                     <div class="comment-body">
                         <p class="username">{{ $comment->user->name }}</p>
                         <p class="text">{{ $comment->body }}</p>
@@ -81,18 +89,24 @@
                 </div>
             @endforeach
 
-            {{-- コメント投稿フォーム --}}
-            <form action="{{ route('comment.store', $item->id) }}" method="POST">
-                @csrf
-                <label for="comment">商品へのコメント</label>
-                <textarea name="body" id="comment" rows="4" >{{ old('body') }}</textarea>
-                @error('body')
-                    <p class="error-message">{{ $message }}</p>
-                @enderror
-                <button type="submit" class="comment-submit">コメントを送信する</button>
-            </form>
+            {{-- コメント投稿フォームの表示制御 --}}
+            @if (empty($error))
+                <form action="{{ route('comment.store', $item->id) }}" method="POST">
+                    @csrf
+                    <label for="comment">商品へのコメント</label>
+                    <textarea name="body" id="comment" rows="4">{{ old('body') }}</textarea>
+                    @error('body')
+                        <p class="error-message">{{ $message }}</p>
+                    @enderror
+                    <button type="submit" class="comment-submit">コメントを送信する</button>
+                </form>
+            @else
+                {{-- 購入済み商品の場合、コメント投稿フォームは非表示にする --}}
+                <p class="alert alert-warning">この商品は購入済みのため、コメント投稿はできません。</p>
+            @endif
 
         </section>
     </div>
 </div>
 @endsection
+

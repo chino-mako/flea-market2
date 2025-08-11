@@ -26,6 +26,22 @@
     flex: 1.2;
 }
 
+.alert {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 20px;
+    margin: 20px auto;
+    max-width: 600px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    background-color: #f1c6c6;
+    color: #602525;
+    border: 1px solid #e29f9f;
+}
+
 .item-title {
     font-size: 24px;
     font-weight: bold;
@@ -49,18 +65,60 @@
     color: #555;
 }
 
+.item-actions {
+    margin-bottom: 20px;
+}
+
 .icon-group {
     display: flex;
-    gap: 1rem;
+    gap: 20px;
     align-items: center;
 }
-.icon {
+
+.icon-item {
     display: flex;
     align-items: center;
-    font-size: 1.2rem;
+    font-size: 18px;
+    color: #333;
 }
-.count {
-    margin-left: 0.3rem;
+
+.icon-item form {
+    display: flex;
+    align-items: center;
+}
+
+.icon-item button {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    line-height: 1;
+    vertical-align: middle;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-star {
+    line-height: 1;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.icon-count {
+    margin-left: 6px;
+    font-size: 16px;
+    color: #333;
+}
+
+.liked {
+    color: #ff891a;
+}
+
+.not-liked {
+    color: #888;
 }
 
 .buy-button {
@@ -74,6 +132,11 @@
     border-radius: 5px;
     text-decoration: none;
     margin-bottom: 30px;
+    transition: background-color 0.3s;
+}
+
+.buy-button:hover {
+    background-color: #e04e4e;
 }
 
 .description, .info, .comments {
@@ -110,6 +173,19 @@
     border-radius: 50%;
     background-color: #ccc;
     margin-right: 10px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.user-icon .profile-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
 }
 
 .comment-body {

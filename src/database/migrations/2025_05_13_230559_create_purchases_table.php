@@ -15,9 +15,11 @@ class CreatePurchasesTable extends Migration
     {
         Schema::create('purchases', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('item_id')->constrained()->onDelete('cascade');
+            $table->foreignId('item_id')->constrained()->onDelete('cascade')->unique();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->enum('payment_method', ['コンビニ払い', 'カード払い']);
+            $table->string('stripe_payment_id')->nullable();
+            $table->boolean('is_paid')->default(false);
             $table->timestamps();
         });
     }

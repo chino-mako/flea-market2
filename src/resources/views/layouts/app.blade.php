@@ -29,7 +29,6 @@
                             placeholder="なにをお探しですか？"
                             class="search-input"
                         >
-                        <button type="submit" class="search-button">検索</button>
                     </form>
                 </div>
                 <div class="nav-right">
@@ -51,7 +50,6 @@
                         placeholder="なにをお探しですか？"
                         class="search-input"
                     >
-                    <button type="submit" class="search-button">検索</button>
                 </form>
             </div>
             <div class="nav-right">
@@ -62,6 +60,20 @@
     </header>
 
     <main class="main-container">
+        @if (session('success'))
+            <div class="custom-alert success">
+                <span class="alert-icon">✔</span>
+                <span class="alert-message">{{ session('success') }}</span>
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="alert alert-danger">
+                <span class="alert-icon">✔</span>
+                <span class="alert-message">{{ session('error') }}</span>
+            </div>
+        @endif
+
         @yield('content')
     </main>
     @stack('scripts')

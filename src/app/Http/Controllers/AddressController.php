@@ -2,50 +2,37 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use App\Http\Requests\AddressRequest;
-use App\Models\Address;
+use Illuminate\Support\Facades\Auth;
 
 class AddressController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
+    /**
+     * 配送先住所の編集画面を表示
+     */
     public function edit($item_id)
     {
-        $user = auth()->user()->load('addressRelation');
-
-        if (!$user) {
-            return redirect()->route('auth.login')->withErrors('ログインしてください');
-        }
-
-        if (!$user->addressRelation) {
-            $user->addressRelation()->create([
-                'postal_code' => $user->postal_code,
-                'address' => $user->address,
-                'building' => $user->building,
-            ]);
-            $user->refresh();
-        }
+        $user = Auth::user();
 
         return view('purchase.address_edit', [
+            'user' => $user,
             'item_id' => $item_id,
-            'address' => $user->addressRelation,
         ]);
     }
 
+    /**
+     * 配送先住所を更新
+     */
     public function update(AddressRequest $request, $item_id)
     {
-        $validated = $request->validated();
+        $user = Auth::user();
 
-        $address = auth()->user()->addressRelation->first() ?? new Address();
-        $address->fill($request->only(['postal_code', 'address', 'building']));
-        $address->user_id = auth()->id();
-        $address->save();
+        $user->postal_code = $request->postal_code;
+        $user->address     = $request->address;
+        $user->building    = $request->building;
+        $user->save();
 
-        return redirect()->route('purchase.show', ['item_id' => $item_id]);
+        return redirect()->route('purchase.show', $item_id)
+                        ->with('success', '住所を更新しました');
     }
 }
